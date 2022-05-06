@@ -53,20 +53,26 @@ namespace Application.Services
 
         #endregion
 
-        public async Task<IEnumerable<User>> FindUserByNameAsync(string? firstname = null, string? lastname = null)
+        public async Task<IEnumerable<User>> FindUserByNameAsync(string firstOrLastName)
         {
             return await _context.UserRegistry
                                         .Where(a =>
-                                                a.FirstName == firstname ||
-                                                a.LastName == lastname)
+                                                a.FirstName == firstOrLastName ||
+                                                a.LastName == firstOrLastName)
                                         .ToListAsync();
         }
 
         public async Task<User> FindUserByUsernameAsync(string username)
         {
-            return await _context.UserRegistry
-                                        .SingleOrDefaultAsync(a=>
-                                                     a.Username == username);
+            User user = null;
+            if (!string.IsNullOrEmpty(username))
+            {
+                user = await _context.UserRegistry
+                                            .SingleOrDefaultAsync(a=>
+                                                         a.Username == username);
+
+            }
+            return user;
         }
 
         public async Task<User> LoginAsync(User user)
@@ -109,9 +115,8 @@ namespace Application.Services
             return (_context.SaveChanges() > 0);
         }
 
-        public Task<User> UpdateInformation(string username, User user)
+        public void UpdateInformation(User user)
         {
-            throw new NotImplementedException();
         }
     }
 }

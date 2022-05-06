@@ -35,9 +35,14 @@ namespace Infrastructure.Interfaces
         /// <param name="username">Username of <see cref="User"/></param>
         /// <returns>User object if found</returns>
         Task<User> FindUserByUsernameAsync(string username);
-        Task<IEnumerable<User>> FindUserByNameAsync(string firstname = null,string lastname = null);
 
-        Task<User> UpdateInformation(string username, User user);
+        /// <summary>
+        /// Find users with the same or similar names
+        /// </summary>
+        /// <returns>A list of users with similar names or the same name</returns>
+        Task<IEnumerable<User>> FindUserByNameAsync(string firstOrLastName );
+
+        void UpdateInformation(User user);
 
         bool SaveChanges();
 

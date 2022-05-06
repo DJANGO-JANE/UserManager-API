@@ -115,6 +115,33 @@ namespace UserManager.Controllers
             return _response;
         }
 
+        [HttpGet("By-Username/{username}")]
+        public async Task<object> FindUserByUserName(string username)
+        {
+            try
+            {
+                var user = await _service.FindUserByUsernameAsync(username);
+                if (user != null)
+                {
+                    _response.Data = _mapper.Map<UserFull>(user);
+                    _response.Code = Ok().StatusCode;
+                }
+                else
+                {
+                    _response.Code = NotFound().StatusCode;
+                    _response.Message = "User search failed";
+                }
+            }
+            catch (Exception ex)
+            {
+
+                _response.ErrorMessages = new List<string> { ex.Message.ToString() };
+                _response.Code = 500;
+                _response.IsSuccessful = false;
+            }
+            return _response;
+        }
+
         [HttpPatch("Update/{username}")]
         public async Task<object> PartiallyUpdateUser(string username, JsonPatchDocument<UserUpdate> userUpdate)
         {
@@ -136,10 +163,10 @@ namespace UserManager.Controllers
                 }
                 _mapper.Map(userToUpdate, modelFromRepo);
 
-                var obj = _service.UpdateInformation(username, modelFromRepo);
+                _service.UpdateInformation(modelFromRepo);
                 _service.SaveChanges();
-
-                _response.Data = _mapper.Map<IEnumerable<UserView>>(obj);
+                var obj = await _service.FindUserByUsernameAsync(username);
+                _response.Data = _mapper.Map<UserFull>(obj);
                 _response.Code = Ok().StatusCode;
 
             }

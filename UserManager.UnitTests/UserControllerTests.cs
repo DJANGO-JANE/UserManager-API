@@ -118,9 +118,7 @@ namespace UserManager.UnitTests
 
             _mockRepo.Setup(c => c.RegisterAsync(It.IsAny<User>()))
                                             .Returns(Task.FromResult(user=null));
-/*
-            _mockRepo.Setup(z => z.FindUserByUsernameAsync(It.IsAny<string>()))
-                                            .Returns(Task.FromResult(user = null));*/
+
 
             var controller = new UserController(_mockRepo.Object, _mapper);
 
@@ -130,6 +128,40 @@ namespace UserManager.UnitTests
 
         }
 
+        [Fact]
+        public async Task SearchUserByUsername_Returns_404NotFound_WhenNoHitsAreMade()
+        {
 
+            User user = new();
+
+            _mockRepo.Setup(c => c.FindUserByUsernameAsync(It.IsAny<string>()))
+                                            .Returns(Task.FromResult(user = null));
+
+
+            var controller = new UserController(_mockRepo.Object, _mapper);
+
+            var result = await controller.FindUserByUserName("string");
+            var response = result as ResponsePayload;
+            Assert.Equal(404, response.Code);
+
+        }
+
+        [Fact]
+        public async Task SearchUserByUsername_Returns_200Ok_WhenHitsAreMade()
+        {
+
+            User user = new();
+
+            _mockRepo.Setup(c => c.FindUserByUsernameAsync(It.IsAny<string>()))
+                                            .Returns(Task.FromResult(_commonUser));
+
+
+            var controller = new UserController(_mockRepo.Object, _mapper);
+
+            var result = await controller.FindUserByUserName("string");
+            var response = result as ResponsePayload;
+            Assert.Equal(200, response.Code);
+
+        }
     }
 }
